@@ -4,7 +4,7 @@ const int N=1e5+5;
 #define int long long
 #define nodes first
 #define sl second
-int n,st[2*N],en[2*N],tree[2*N],tour[2*N],m,edges,sal[N];
+int n,st[2*N],en[2*N],tree[2*N],tour[2*N],m,edges,sal[N],lazy[4*N];
 vector<int>adj[N];
 void dfs(int u, int parent_of_u) {
     tour[++m].first=u;
@@ -26,8 +26,36 @@ void build(int id,int l,int r){
 	build(id*2,l,mid); build(id*2+1,mid+1,r);
 	tree[id]=max(tree[id*2],tree[id*2+1]);
 }
+void push(int id){
+	if(lazy[id]!=0){
+		tree[id*2]+=lazy[id];
+		lazy[id*2]+=lazy[id];
+		tree[id*2+1]+=lazy[id];
+		lazy[id*2+1]+=lazy[id];
+		lazy[id]=0;
+	}
+}
 void up(int id,int l,int r,int u,int v,int k){
-	if(l>v||r<u)
+	if(l>v||r<u) return;
+	if(u<=l&&r<=v){
+		tree[id]+=k;
+		lazy[id]+=k;
+		return;
+	}
+	push(id);
+	int mid=(l+r)>>1;
+	up(id*2,l,mid,u,v);
+	up(id*2+1,mid+1,u,v);
+	tree[id]=max(tree[id*2],tree[id*2+1]);
+}
+int get(int id,int l,int r,int u,int v){
+	if(l>v||r<u) return 0;
+	if(u<=l&&r<=v){
+		return tree[id];
+	}
+	push(id);
+	int mid=(l+r)>>1;
+	
 }
 main(){
 	cin>>n>>edges;
